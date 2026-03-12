@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Engine | AU Hackathon</title>
+    <style>
+        /* Base Reset & Typography */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f4f4f5;
+            color: #18181b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 60px 20px;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header { text-align: center; margin-bottom: 20px; }
+        header h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+        header p { color: #71717a; font-size: 16px; }
+
+        /* The Drag & Drop Zone */
+        .upload-zone {
+            width: 100%;
+            padding: 80px 20px;
+            border: 2px dashed #a1a1aa;
+            border-radius: 16px;
+            background-color: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #18181b;
+            background-color: #fafafa;
+            transform: translateY(-2px);
+        }
+        .upload-zone p { color: #52525b; font-size: 18px; font-weight: 500; }
+        .upload-zone span { display: block; color: #a1a1aa; font-size: 14px; margin-top: 8px; }
+        #fileInput { display: none; }
+
+        /* Controls / Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #18181b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        button:hover { background: #3f3f46; transform: translateY(-1px); }
+        
+        /* Specific Nav Buttons */
+        #newDocBtn { background: white; color: #18181b; border: 1px solid #d4d4d8; display: none; box-shadow: none; }
+        #newDocBtn:hover { background: #f4f4f5; }
+
+        .nav-btn { background: transparent; color: #52525b; border: 1px solid #d4d4d8; display: none; box-shadow: none; }
+        .nav-btn:hover { background: #e4e4e7; color: #18181b; }
+
+        /* The Magic Output Box */
+        #outputBox {
+            display: none;
+            padding: 40px 50px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            text-align: left;
+            transition: all 0.5s ease;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        /* THE NEW FILE NAME HEADER */
+        #currentFileName {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a1a1aa;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e4e4e7;
+            font-weight: 600;
+        }
+
+        #finalText {
+            font-size: 20px;
+            line-height: 1.6;
+            color: #27272a;
+        }
+        b { font-weight: 700; color: #000; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- OPTICAL HARMONY MODE --- */
+        body.harmony-mode { background-color: #F4EED8; color: #2C2C2C; }
+        body.harmony-mode header p { color: #5c5c5c; }
+        body.harmony-mode .upload-zone { background-color: #FCFAF2; border-color: #c2baa6; }
+        body.harmony-mode #outputBox { background-color: #FCFAF2; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
+        body.harmony-mode #currentFileName {
+            color: #8b8577;
+            border-bottom-color: #d4ccb6;
+        }
+
+        body.harmony-mode #finalText {
+            line-height: 2.2; 
+            letter-spacing: 1.2px; 
+            word-spacing: 4px; 
+            font-size: 22px;
+            color: #2C2C2C;
+        }
+        body.harmony-mode b { color: #000; }
+        body.harmony-mode .nav-btn, body.harmony-mode #newDocBtn { border-color: #c2baa6; color: #5c5c5c; }
+        body.harmony-mode .nav-btn:hover, body.harmony-mode #newDocBtn:hover { background: #e6dfc8; color: #18181b; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Cognitive Engine</h1>
+            <p>Frictionless document accessibility. Drop a file to begin.</p>
+        </header>
+
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <p id="dropText">Drag & Drop a document here</p>
+            <span id="dropSubText">Supports .txt, .pdf, and .docx</span>
+            <input type="file" id="fileInput" accept=".txt,.pdf,.docx" onchange="handleFileUpload(this.files[0])">
+        </div>
+        
+        <div id="outputBox">
+            <h3 id="currentFileName"></h3>
+            <p id="finalText"></p>
+        </div>
+
+        <div class="controls">
+            <button class="nav-btn" id="prevBtn" onclick="goBack()">&#8592; Previous</button>
+            <button onclick="toggleHarmony()" id="harmonyBtn">Enable Optical Harmony</button>
+            <button class="nav-btn" id="nextBtn" onclick="goForward()">Next &#8594;</button>
+            <button id="newDocBtn" onclick="showUploadZone()">+ New Document</button>
+            <button class="nav-btn" id="cancelBtn" onclick="renderCurrentDocument()" style="display:none;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // --- UPGRADED DOCUMENT STACK ---
+        // Now holds objects like { fileName: "report.pdf", content: "<b>For</b>matted..." }
+        let documentStack = [];
+        let currentIndex = -1;
+
+        const dropZone = document.getElementById('dropZone');
+        const dropText = document.getElementById('dropText');
+        const dropSubText = document.getElementById('dropSubText');
+        const fileInput = document.getElementById('fileInput');
+        const outputBox = document.getElementById('outputBox');
+        
+        const currentFileName = document.getElementById('currentFileName'); // NEW
+        const finalText = document.getElementById('finalText');
+        
+        const newDocBtn = document.getElementById('newDocBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        
+        // Drag and Drop Visuals
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files[0]);
+        });
+
+        // The API Call
+        async function handleFileUpload(file) {
+            if (!file) return;
+            const validTypes = ['.txt', '.pdf', '.docx'];
+            if (!validTypes.some(ext => file.name.toLowerCase().endsWith(ext))) {
+                alert("Please upload a .txt, .pdf, or .docx file.");
+                return;
+            }
+
+            dropText.innerHTML = "Extracting and processing...";
+            dropSubText.style.display = "none";
+            dropZone.style.pointerEvents = "none";
+
+            const formData = new FormData();
+            formData.append('document', file);
+
+            try {
+                const response = await fetch('/api/upload', { method: 'POST', body: formData });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Save BOTH the name and the formatted text
+                    documentStack.push({
+                        fileName: file.name,
+                        content: data.formatted_text
+                    });
+                    currentIndex = documentStack.length - 1;
+                    
+                    // Display it
+                    renderCurrentDocument();
+                } else {
+                    alert("Error: " + data.error);
+                    showUploadZone();
+                }
+            } catch (error) {
+                console.error("Upload failed:", error);
+                alert("Something went wrong with the server connection.");
+                showUploadZone();
+            }
+        }
+
+        // --- UPGRADED: The Page Flipping Logic ---
+        function renderCurrentDocument() {
+            if (currentIndex >= 0 && currentIndex < documentStack.length) {
+                const currentDoc = documentStack[currentIndex];
+                
+                // Inject the file name and content
+                currentFileName.innerText = "Reading: " + currentDoc.fileName;
+                finalText.innerHTML = currentDoc.content;
+                
+                dropZone.style.display = 'none'; 
+                outputBox.style.display = 'block'; 
+                
+                newDocBtn.style.display = 'inline-block';
+                cancelBtn.style.display = 'none';
+
+                prevBtn.style.display = (currentIndex > 0) ? 'inline-block' : 'none';
+                nextBtn.style.display = (currentIndex < documentStack.length - 1) ? 'inline-block' : 'none';
+            }
+        }
+
+        function goBack() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderCurrentDocument();
+            }
+        }
+
+        function goForward() {
+            if (currentIndex < documentStack.length - 1) {
+                currentIndex++;
+                renderCurrentDocument();
+            }
+        }
+
+        function showUploadZone() {
+            outputBox.style.display = 'none';
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+            newDocBtn.style.display = 'none';
+            
+            dropZone.style.display = 'block';
+            dropZone.style.pointerEvents = "auto";
+            dropText.innerHTML = "Drag & Drop a document here";
+            dropSubText.style.display = "block";
+            fileInput.value = ''; 
+
+            if (documentStack.length > 0) {
+                cancelBtn.style.display = 'inline-block';
+            }
+        }
+
+        // The Accessibility Toggle
+        function toggleHarmony() {
+            document.body.classList.toggle('harmony-mode');
+            const btn = document.getElementById('harmonyBtn');
+            btn.innerHTML = document.body.classList.contains('harmony-mode') ? "Disable Optical Harmony" : "Enable Optical Harmony";
+        }
+    </script>
+</body>
+</html>

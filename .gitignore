@@ -1,0 +1,10 @@
+# Python cache files
+__pycache__/
+*.pyc
+
+# Virtual environments (if you use one later)
+venv/
+env/
+
+# OS generated files
+.DS_Store

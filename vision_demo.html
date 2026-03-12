@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Optical Harmony Demo</title>
+    <style>
+        /* Default State */
+        body {
+            font-family: 'Inter', 'Helvetica Neue', sans-serif;
+            background-color: #ffffff; /* Stark white */
+            color: #000000; /* Stark black */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+            transition: all 0.5s ease; /* Smooth elegant transition */
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        p {
+            font-size: 20px;
+            line-height: 1.5;
+            transition: all 0.5s ease;
+        }
+        
+        /* The Jobsian Toggle Button */
+        .controls { margin-bottom: 40px; }
+        button {
+            background: #18181b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: background 0.3s ease;
+        }
+        button:hover { background: #3f3f46; }
+
+        /* OPTICAL HARMONY MODE (For glasses & reading issues) */
+        body.harmony-mode {
+            background-color: #F4EED8; /* Warm, anti-glare paper tone */
+            color: #2C2C2C; /* Soft charcoal to stop halation */
+        }
+        body.harmony-mode p {
+            line-height: 2.2; /* Breathe room for lines */
+            letter-spacing: 1.5px; /* Breathe room for letters */
+            word-spacing: 4px; /* Breathe room for words */
+            font-size: 22px; /* Slight optical bump */
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="toggleHarmony()" id="harmonyBtn">Enable Optical Harmony</button>
+    </div>
+
+    <div class="container">
+        <p id="textContent"><b>Th</b>is <b>i</b>s <b>cha</b>os. <b>Eve</b>ry <b>sin</b>gle <b>da</b>y, <b>thous</b>ands <b>o</b>f <b>profess</b>ionals <b>an</b>d <b>stud</b>ents <b>was</b>te <b>count</b>less <b>hou</b>rs <b>star</b>ing <b>a</b>t <b>da</b>ta <b>exac</b>tly <b>li</b>ke <b>th</b>is. <b>Th</b>ey <b>manu</b>ally <b>fi</b>x <b>th</b>e <b>cas</b>ing. <b>Th</b>ey <b>hu</b>nt <b>fo</b>r <b>keyw</b>ords <b>t</b>o <b>bo</b>ld. <b>Th</b>ey <b>tr</b>y <b>t</b>o <b>force</b>fully <b>dr</b>ag <b>ra</b>w, <b>mes</b>sy <b>inform</b>ation <b>in</b>to <b>somet</b>hing <b>th</b>at <b>i</b>s <b>actu</b>ally <b>read</b>able. <b>I</b>t <b>dra</b>ins <b>ti</b>me. <b>I</b>t <b>dra</b>ins <b>ene</b>rgy. <b>An</b>d <b>fran</b>kly, <b>i</b>n <b>20</b>26, <b>i</b>t <b>i</b>s <b>compl</b>etely <b>unacce</b>ptable.</p>
+    </div>
+
+    <script>
+        function toggleHarmony() {
+            var body = document.body;
+            var btn = document.getElementById('harmonyBtn');
+            body.classList.toggle('harmony-mode');
+            
+            if (body.classList.contains('harmony-mode')) {
+                btn.innerHTML = "Disable Optical Harmony";
+            } else {
+                btn.innerHTML = "Enable Optical Harmony";
+            }
+        }
+    </script>
+</body>
+</html>
