@@ -25,3 +25,7 @@ The Cognitive Engine is a zero-database, privacy-first web application that inst
 2. Install the required dependencies:
    ```bash
    pip install flask PyPDF2 python-docx
+
+
+   its good for those who love reading in their type of comfort
+   
